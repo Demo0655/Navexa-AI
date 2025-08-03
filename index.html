@@ -3,352 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Navexa AI</title>
+    <title>My Navexa Chatbot</title>
     <!-- Tailwind CSS for modern styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Marked.js for Markdown rendering -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Animate.css for animations -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <style>
         /* Custom CSS */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
             transition: background-color 0.3s, color 0.3s;
-            background-color: #f7fafc;
         }
+
         .dark body {
             background-color: #1a202c;
             color: #e2e8f0;
-        }
-        
-        /* Floating chat container */
-        .chat-app {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 100;
-            width: 95%;
-            max-width: 800px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            transform: translateY(0);
-            transition: transform 0.3s ease-in-out;
-        }
-        
-        .chat-app.hide {
-            transform: translateY(100px);
-        }
-        
-        .chat-app-header {
-            position: sticky;
-            top: 0;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 1rem;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .chat-app-header h1 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #1a202c;
-        }
-        
-        .chat-app-header .controls {
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-        }
-        
-        .chat-app-header button {
-            background: none;
-            border: none;
-            color: #64748b;
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 50%;
-            transition: all 0.2s ease;
-        }
-        
-        .chat-app-header button:hover {
-            background-color: rgba(0, 0, 0, 0.05);
-            color: #1a202c;
-        }
-        
-        .chat-app-header button.active {
-            color: #4c51bf;
-        }
-        
-        /* Sidebar */
-        .sidebar {
-            width: 280px;
-            padding: 1rem;
-            border-right: 1px solid rgba(0, 0, 0, 0.1);
-        }
-        
-        .sidebar-section {
-            margin-bottom: 1.5rem;
-        }
-        
-        .sidebar-section h3 {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #475569;
-            margin-bottom: 0.75rem;
-        }
-        
-        .sidebar-section ul {
-            list-style: none;
-            padding: 0;
-        }
-        
-        .sidebar-section li {
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .sidebar-section li:hover {
-            background-color: rgba(0, 0, 0, 0.05);
-        }
-        
-        .sidebar-section li.active {
-            background-color: rgba(76, 81, 191, 0.1);
-            color: #4c51bf;
-        }
-        
-        /* Chat content area */
-        .chat-content {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            overflow: hidden;
-        }
-        
-        .chat-messages {
-            flex-grow: 1;
-            padding: 1.5rem;
-            overflow-y: auto;
-            scroll-behavior: smooth;
-        }
-        
-        .message-row {
-            display: flex;
-            margin-bottom: 1rem;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-        
-        .user-message {
-            background-color: #f3f4f6;
-            color: #1a202c;
-            border-radius: 1rem;
-            border-bottom-right-radius: 0.25rem;
-            padding: 0.75rem 1rem;
-            max-width: 80%;
-            margin-left: auto;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-        
-        .ai-message-container {
-            display: flex;
-            align-items: flex-start;
-            gap: 0.5rem;
-            margin-right: auto;
-            max-width: 80%;
-            animation: slideIn 0.3s ease-in-out;
-        }
-        
-        .ai-message {
-            background-color: #4c51bf;
-            color: #ffffff;
-            border-radius: 1rem;
-            border-bottom-left-radius: 0.25rem;
-            padding: 0.75rem 1rem;
-            position: relative;
-            box-shadow: 0 2px 4px rgba(76, 81, 191, 0.2);
-        }
-        
-        .ai-message img {
-            max-width: 100%;
-            border-radius: 0.75rem;
-            margin-top: 0.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        .typing-indicator {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-            color: #4c51bf;
-            font-size: 0.875rem;
-        }
-        
-        .typing-indicator .dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background-color: #4c51bf;
-            animation: typing 1.4s infinite ease-in-out;
-        }
-        
-        .typing-indicator .dot:nth-child(1) { animation-delay: 0s; }
-        .typing-indicator .dot:nth-child(2) { animation-delay: 0.2s; }
-        .typing-indicator .dot:nth-child(3) { animation-delay: 0.4s; }
-        
-        /* Chat input area */
-        .chat-input-container {
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid rgba(0, 0, 0, 0.1);
-        }
-        
-        .chat-input {
-            flex-grow: 1;
-            padding: 0.75rem 1rem;
-            border: 2px solid #cbd5e0;
-            border-radius: 0.5rem;
-            margin-right: 0.5rem;
-            transition: all 0.2s ease-in-out;
-            resize: none;
-            background-color: #ffffff;
-            color: #1a202c;
-            font-family: 'Inter', sans-serif;
-        }
-        
-        .chat-input:focus {
-            outline: none;
-            border-color: #4c51bf;
-            box-shadow: 0 0 0 3px rgba(76, 81, 191, 0.1);
-        }
-        
-        .chat-button {
-            background-color: #4c51bf;
-            color: #ffffff;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .chat-button:hover {
-            background-color: #434190;
-            transform: translateY(-1px);
-        }
-        
-        .chat-button:disabled {
-            background-color: #a0aec0;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        /* Settings panel */
-        .settings-panel {
-            position: fixed;
-            top: 0;
-            right: 0;
-            width: 320px;
-            height: 100vh;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 1rem;
-            transform: translateX(100%);
-            transition: transform 0.3s ease-in-out;
-        }
-        
-        .settings-panel.show {
-            transform: translateX(0);
-        }
-        
-        .settings-panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-        
-        .settings-panel-header button {
-            background: none;
-            border: none;
-            color: #64748b;
-            cursor: pointer;
-            padding: 0.5rem;
-        }
-        
-        .settings-option {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-        }
-        
-        .settings-option:last-child {
-            border-bottom: none;
-        }
-        
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-        
-        @keyframes typing {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-2px); }
-        }
-        
-        /* Dark mode styles */
-        .dark {
-            background-color: #1a202c;
-            color: #e2e8f0;
-        }
-        
-        .dark .chat-app {
-            background: rgba(26, 32, 44, 0.95);
-        }
-        
-        .dark .chat-app-header {
-            background: rgba(26, 32, 44, 0.95);
-        }
-        
-        .dark .chat-input {
-            background-color: #2d3748;
-            border-color: #4a5568;
-            color: #e2e8f0;
-        }
-        
-        .dark .user-message {
-            background-color: #4a5568;
-            color: #e2e8f0;
-        }
-        
-        .dark .ai-message {
-            background-color: #6366f1;
-        }
-        
-        .dark .settings-panel {
-            background: rgba(26, 32, 44, 0.95);
         }
 
         .chat-container {
@@ -555,121 +227,36 @@
         }
     </style>
 </head>
-<body class="min-h-screen">
-    <!-- Floating chat app -->
-    <div class="chat-app" id="chatApp">
-        <!-- Chat app header -->
-        <div class="chat-app-header">
-            <h1>Navexa AI</h1>
-            <div class="controls">
-                <button id="minimizeButton" title="Minimize">
-                    <i class="fas fa-minus"></i>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+    <div class="chat-container">
+        <!-- Chat header with controls -->
+        <div class="chat-header">
+            <h1 class="text-xl font-bold">My Navexa Chatbot</h1>
+            <div class="flex items-center space-x-2">
+                <button id="clear-button" class="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold hover:bg-red-600 transition-colors">
+                    Clear
                 </button>
-                <button id="settingsButton" title="Settings">
-                    <i class="fas fa-cog"></i>
-                </button>
-                <button id="themeToggle" title="Toggle Dark Mode">
-                    <span class="light-icon"><i class="fas fa-sun"></i></span>
-                    <span class="dark-icon"><i class="fas fa-moon"></i></span>
+                <button id="theme-toggle" class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white px-3 py-1 rounded-full text-sm font-semibold transition-colors">
+                    <span class="light-icon">☀️</span>
+                    <span class="dark-icon hidden">🌙</span>
                 </button>
             </div>
         </div>
 
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="sidebar-section">
-                <h3>Quick Actions</h3>
-                <ul>
-                    <li id="newChat" class="active">
-                        <i class="fas fa-comment"></i> New Chat
-                    </li>
-                    <li id="imageMode">
-                        <i class="fas fa-image"></i> Image Mode
-                    </li>
-                    <li id="codeMode">
-                        <i class="fas fa-code"></i> Code Mode
-                    </li>
-                    <li id="voiceMode">
-                        <i class="fas fa-microphone"></i> Voice Mode
-                    </li>
-                </ul>
-            </div>
-            <div class="sidebar-section">
-                <h3>Recent Conversations</h3>
-                <ul id="conversationHistory">
-                    <!-- Conversations will be populated here -->
-                </ul>
-            </div>
-        </div>
-
-        <!-- Chat content area -->
-        <div class="chat-content">
-            <!-- Chat messages display area -->
-            <div id="chatMessages" class="chat-messages">
-                <div class="message-row">
-                    <div class="ai-message-container">
-                        <div class="ai-message">
-                            <div class="typing-indicator">
-                                <span class="dot"></span>
-                                <span class="dot"></span>
-                                <span class="dot"></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Chat input area -->
-            <div class="chat-input-container">
-                <div class="input-group">
-                    <button id="voiceInput" title="Voice Input">
-                        <i class="fas fa-microphone"></i>
-                    </button>
-                    <textarea id="userInput" class="chat-input" placeholder="Ask me anything... (e.g., /image a cute cat)" rows="1"></textarea>
-                    <button id="sendButton" class="chat-button">
-                        <i class="fas fa-paper-plane"></i>
-                        Send
-                    </button>
+        <!-- Chat messages display area -->
+        <div id="chat-messages" class="chat-messages">
+            <div class="message-row">
+                <div class="ai-message-container">
+                    <div class="ai-message">Hello! I am your personal Navexa assistant. How can I help you today?</div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Settings panel -->
-    <div class="settings-panel" id="settingsPanel">
-        <div class="settings-panel-header">
-            <h2>Settings</h2>
-            <button id="closeSettings">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="settings-options">
-            <div class="settings-option">
-                <div>
-                    <h3>Response Style</h3>
-                    <p>Adjust how the AI responds to your queries</p>
-                </div>
-                <select id="responseStyle">
-                    <option value="casual">Casual</option>
-                    <option value="professional">Professional</option>
-                    <option value="creative">Creative</option>
-                </select>
-            </div>
-            <div class="settings-option">
-                <div>
-                    <h3>Temperature</h3>
-                    <p>Controls the randomness of responses</p>
-                </div>
-                <input type="range" id="temperature" min="0" max="1" step="0.1" value="0.7">
-                <span id="temperatureValue">0.7</span>
-            </div>
-            <div class="settings-option">
-                <div>
-                    <h3>Max Response Length</h3>
-                    <p>Maximum length of AI responses</p>
-                </div>
-                <input type="number" id="maxLength" min="50" max="2000" value="1000">
-            </div>
+        <!-- Chat input and button -->
+        <div class="chat-input-container">
+            <textarea id="user-input" class="chat-input" placeholder="Ask me anything... (e.g., /image a cute cat)" rows="1"></textarea>
+            <button id="send-button" class="chat-button">Send</button>
         </div>
     </div>
 
@@ -944,11 +531,7 @@
 
             // Display loading indicator
             const loadingMessage = displayMessage('', 'ai');
-            loadingMessage.querySelector('.ai-message').innerHTML = '<div class="typing-indicator">'
-                + '<span class="dot"></span>'
-                + '<span class="dot"></span>'
-                + '<span class="dot"></span>'
-                + '</div>';
+            loadingMessage.querySelector('.ai-message').innerHTML = '<span class="loading-dots">Thinking</span>';
 
             // Check for image generation command
             if (userText.startsWith('/image ')) {
@@ -957,15 +540,7 @@
             } else {
                 // Handle text generation
                 try {
-                    const payload = {
-                        contents: chatHistory,
-                        generationConfig: {
-                            temperature: parseFloat(temperature.value),
-                            topP: 0.8,
-                            topK: 40,
-                            maxOutputTokens: parseInt(maxLength.value)
-                        }
-                    };
+                    const payload = { contents: chatHistory };
 
                     const response = await fetchWithRetry(TEXT_API_URL, {
                         method: 'POST',
@@ -983,7 +558,6 @@
                     });
 
                     loadingMessage.querySelector('.ai-message').innerHTML = renderedHtml;
-                    saveConversation();
 
                 } catch (error) {
                     console.error('Error fetching from Navexa API:', error);
@@ -994,8 +568,51 @@
             // Re-enable input and button
             sendButton.disabled = false;
             userInput.focus();
+            // Scroll to the bottom of the chat
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
+
+        // --- Event Listeners ---
+        
+        sendButton.addEventListener('click', sendMessage);
+        userInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault(); // Prevent new line on Enter
+                sendMessage();
+            }
+        });
+
+        // Auto-adjust textarea height
+        userInput.addEventListener('input', () => {
+            userInput.style.height = 'auto';
+            userInput.style.height = userInput.scrollHeight + 'px';
+        });
+
+        // Clear chat history
+        clearButton.addEventListener('click', () => {
+            chatMessages.innerHTML = `
+                <div class="message-row">
+                    <div class="ai-message-container">
+                        <div class="ai-message">Hello! I am your personal Navexa assistant. How can I help you today?</div>
+                    </div>
+                </div>`;
+            chatHistory = [{
+                role: "user",
+                parts: [{ text: "Hello!" }] 
+            }, {
+                role: "model",
+                parts: [{ text: "Hello! I am your personal Navexa assistant. How can I help you today?" }] 
+            }];
+        });
+
+        // Theme toggle
+        themeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            const lightIcon = document.querySelector('.light-icon');
+            const darkIcon = document.querySelector('.dark-icon');
+            lightIcon.classList.toggle('hidden');
+            darkIcon.classList.toggle('hidden');
+        });
 
     </script>
 </body>
